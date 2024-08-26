@@ -11,38 +11,39 @@ def SendEmail():
         ReceiverEmailID = ReceiverMailIdInput.get()
         CCEmailID = CCEmailInput.get()
         Subject = SubjectInput.get()
-        MessegeBody = MessegeTextInput.get("1.0", tk.END)
-        Mail = f"Subject: {Subject}\n{MessegeBody}"
+        MessageBody = MessageTextInput.get("1.0", tk.END)
+        Mail = f"Subject: {Subject}\n{MessageBody}"
 
         Smtp = smtplib.SMTP('smtp.gmail.com', 587)
         Smtp.starttls()
 
         try:
             Smtp.login(SenderEmailID, SenderPassword)
-        except smtplib.SMTPAuthenticationError as Error:
-            messagebox.showerror("Error", "Given Credentials are wrong. Please try again.")
+        except smtplib.SMTPAuthenticationError:
+            messagebox.showerror("Error", "Invalid Credentials. Please check your email and password.")
             return
-        
+
         try:
             Recipients = [ReceiverEmailID] + CCEmailID.split(",")
             Smtp.sendmail(SenderEmailID, Recipients, Mail)
-        except smtplib.SMTPRecipientsRefused as Error:
-            messagebox.showerror("Error", "Receiver Mail ID is invalid.")
+        except smtplib.SMTPRecipientsRefused:
+            messagebox.showerror("Error", "Invalid Receiver Email ID.")
+            return
 
         Smtp.quit()
         messagebox.showinfo("Success", "Email sent successfully!")
 
         SubjectInput.delete(0, tk.END)
-        MessegeTextInput.delete("1.0", tk.END)
+        MessageTextInput.delete("1.0", tk.END)
 
-    except Exception as Error:
-        messagebox.showerror("Error", "Failed to send email.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to send email: {str(e)}")
 
 def ExitApp():
     AppWindow.destroy()
 
 def CreateWindow():
-    global SenderMailIdInput, SenderPWInput, ReceiverMailIdInput, SubjectInput, MessegeTextInput
+    global SenderMailIdInput, SenderPWInput, ReceiverMailIdInput, CCEmailInput, SubjectInput, MessageTextInput
 
     BackgroundColour = '#ace4f3'
     ForegroundColour = '#2e2d2b'
@@ -52,22 +53,28 @@ def CreateWindow():
     AppWindow.configure(bg = BackgroundColour)
 
     tk.Label(AppWindow, text = "Sender Email ID:", bg = BackgroundColour, fg = ForegroundColour).grid(row = 0, column = 0, padx = PaddingX, pady = PaddingY)
-    SenderMailIdInput = tk.Entry(AppWindow, width = InputBoxWidth).grid(row = 0, column = 1, padx = PaddingX, pady = PaddingY)
+    SenderMailIdInput = tk.Entry(AppWindow, width = InputBoxWidth)
+    SenderMailIdInput.grid(row = 0, column = 1, padx = PaddingX, pady = PaddingY)
 
     tk.Label(AppWindow, text = "Password:", bg = BackgroundColour, fg = ForegroundColour).grid(row = 1, column = 0, padx = PaddingX, pady = PaddingY)
-    SenderPWInput = tk.Entry(AppWindow, width = InputBoxWidth, show = "*").grid(row = 1, column = 1, padx = PaddingX, pady = PaddingY)
+    SenderPWInput = tk.Entry(AppWindow, width = InputBoxWidth, show = "*")
+    SenderPWInput.grid(row = 1, column = 1, padx = PaddingX, pady = PaddingY)
 
     tk.Label(AppWindow, text = "Receiver Email ID:", bg = BackgroundColour, fg = ForegroundColour).grid(row = 2, column = 0, padx = PaddingX, pady = PaddingY)
-    ReceiverMailIdInput = tk.Entry(AppWindow, width = InputBoxWidth).grid(row = 2, column = 1, padx = PaddingX, pady = PaddingY)
+    ReceiverMailIdInput = tk.Entry(AppWindow, width = InputBoxWidth)
+    ReceiverMailIdInput.grid(row = 2, column = 1, padx = PaddingX, pady = PaddingY)
 
-    tk.Label(AppWindow, text="CC:", bg = BackgroundColour, fg = ForegroundColour).grid(row = 3, column = 0, padx = PaddingX, pady = PaddingY)
-    CCEmailInput = tk.Entry(AppWindow, width = InputBoxWidth).grid(row = 3, column = 1, padx = PaddingX, pady = PaddingY)
+    tk.Label(AppWindow, text = "CC:", bg = BackgroundColour, fg = ForegroundColour).grid(row = 3, column = 0, padx = PaddingX, pady = PaddingY)
+    CCEmailInput = tk.Entry(AppWindow, width = InputBoxWidth)
+    CCEmailInput.grid(row = 3, column = 1, padx = PaddingX, pady = PaddingY)
 
     tk.Label(AppWindow, text = "Subject:", bg = BackgroundColour, fg = ForegroundColour).grid(row = 4, column = 0, padx = PaddingX, pady = PaddingY)
-    SubjectInput = tk.Entry(AppWindow, width = InputBoxWidth).grid(row = 4, column = 1, padx = PaddingX, pady = PaddingY)
+    SubjectInput = tk.Entry(AppWindow, width = InputBoxWidth)
+    SubjectInput.grid(row = 4, column = 1, padx = PaddingX, pady = PaddingY)
 
     tk.Label(AppWindow, text = "Message:", bg = BackgroundColour, fg = ForegroundColour).grid(row = 5, column = 0, padx = PaddingX, pady = PaddingY)
-    MessegeTextInput = tk.Text(AppWindow, height = PaddingX, width = InputBoxWidth, bg='#fffacd').grid(row = 5, column = 1, padx = 50, pady = PaddingX)
+    MessageTextInput = tk.Text(AppWindow, height = 10, width = InputBoxWidth, bg = '#fffacd')
+    MessageTextInput.grid(row = 5, column = 1, padx = 50, pady = PaddingX)
 
     SendButton = tk.Button(AppWindow, text = "Send Email", command = SendEmail, bg = '#32cd32', fg = 'white')
     SendButton.grid(row = 6, column = 1, padx = PaddingX, pady = PaddingX)
